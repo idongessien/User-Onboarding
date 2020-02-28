@@ -1,37 +1,106 @@
-import React from 'react';
-import { useFormik } from 'formik';
+import React, { useEffect, useState } from 'react';
+import { withFormik, Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
+import axios from 'axios';
 
-const validationSchema = Yup.object({
-    name: Yup.string().required('Required'),
-    email: Yup.string().required('Required'),
-    password: Yup.string().required('Required')
-});
+const UserForm = ({ errors, status, touched, values }) => {
+    const[users, setUsers] = useState([]);
+    
+    useEffect(() => {
+        console.log("status changed", status);
+        status && setUsers(users => [...users, status])
+    }, [status]);
 
-export default function UserForm() {
-    const { handleSubmit, handleChange, values, errors } = useFormik({
-      initialValues: {
-        name: "",
-        email: "",
-        password: ""
-      }, 
-      validationSchema,
-      onSubmit(values, tools) {
-          console.log(values, tools);
-      } 
-    });
     return (
-        <form onSubmit={ handleSubmit }>
-            <input name="name" type="text" placeholder="Full Name" onChange={ handleChange } values={ values.name } />
-            { errors.name }
+        <div>
+            <Form>
+                <label htmlFor = "name">
+                    Name:
+                    <Field 
+                        id = "name"
+                        type = "text"
+                        name = "name"
+                        placeholder = "Name..."
+                    />
+                    { touched.name && errors.name && (
+                        <h4>{ errors.name }</h4>
+                    )}
+                </label>
 
-            <input name="email" type="email" placeholder="Email" onChange={ handleChange } values={ values.email }/>
-            { errors.email }
+                <label htmlFor = "email">
+                    Email:
+                    <Field 
+                        id = "email"
+                        type = "email"
+                        name = "email"
+                        placeholder = "Email..."
+                    />
+                    { touched.email && errors.email && (
+                        <h4>{ errors.email }</h4>
+                    )}
+                </label>
 
-            <input name="password" type="password" placeholder="Password" onChange={ handleChange } values={ values.password } /> 
-            { errors.password }
+                <label htmlFor = "password">
+                    Password:
+                    <Field 
+                        id = "password"
+                        type = "password"
+                        name = "password"
+                        placeholder = "Password..."
+                    />
+                    { touched.password && errors.password && (
+                        <h4>{ errors.password }</h4>
+                    )}
+                </label>
 
-            <button type="submit">Submit</button>
-        </form>
-            ); // End return
-} // End Function
+                <label htmlFor = "terms">
+                    "I agree to the terms":
+                    <Field 
+                        id = "terms"
+                        type = "checkbox"
+                        name = "terms"
+                        checked = { values.terms }
+                    />
+                    { touched.password && errors.password && (
+                        <h4>{ errors.password }</h4>
+                    )}
+                </label>
+
+                <button type="submit">SUBMIT</button>
+            </Form>
+
+                    <pre>{ JSON.stringify(values, null, 2)}</pre>
+                    {users.map(user => (
+                        <ul key={ user.id }>
+                            <li>Name: { user.name }</li>
+                            <li>Email: { user.email }</li>
+                            <li>Password: { user.password }</li>
+                        </ul>
+                    ))}
+        </div>
+    )
+}
+
+const FormikUserForm = withFormik({
+    mapPropsToValues({ name, email, password, terms }) {
+        return {
+            name: name || "",
+            email: email || "",
+            password: password || "",
+            terms: terms || false
+        };
+    },
+    validationSchema: Yup.object().shape({
+        name: Yup.string().required(),
+        email: Yup.string().required()
+    }),
+    handleSubmit(values, { setStatus, resetForm }) {
+        console.log("Submitting...", values);
+        axios.post("https://reqres.in/api/users", values).then(response => {
+            console.log("success", response);
+            setStatus(response.data);
+            resetForm();
+        });
+    }
+})(UserForm);
+export default FormikUserForm;
