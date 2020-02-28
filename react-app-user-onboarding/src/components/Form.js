@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { withFormik, Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
+import '../form.css';
 
 const UserForm = ({ errors, status, touched, values }) => {
     const[users, setUsers] = useState([]);
@@ -12,15 +13,15 @@ const UserForm = ({ errors, status, touched, values }) => {
     }, [status]);
 
     return (
-        <div>
-            <Form>
+        <div className="form-container">
+            <Form className="form">
                 <label htmlFor = "name">
-                    Name:
                     <Field 
                         id = "name"
                         type = "text"
                         name = "name"
                         placeholder = "Name..."
+                        className="field"
                     />
                     { touched.name && errors.name && (
                         <h4>{ errors.name }</h4>
@@ -28,12 +29,12 @@ const UserForm = ({ errors, status, touched, values }) => {
                 </label>
 
                 <label htmlFor = "email">
-                    Email:
                     <Field 
                         id = "email"
                         type = "email"
                         name = "email"
                         placeholder = "Email..."
+                        className="field"
                     />
                     { touched.email && errors.email && (
                         <h4>{ errors.email }</h4>
@@ -41,12 +42,12 @@ const UserForm = ({ errors, status, touched, values }) => {
                 </label>
 
                 <label htmlFor = "password">
-                    Password:
                     <Field 
                         id = "password"
                         type = "password"
                         name = "password"
                         placeholder = "Password..."
+                        className="field"
                     />
                     { touched.password && errors.password && (
                         <h4>{ errors.password }</h4>
@@ -54,7 +55,7 @@ const UserForm = ({ errors, status, touched, values }) => {
                 </label>
 
                 <label htmlFor = "terms">
-                    "I agree to the terms":
+                    "I agree to terms"
                     <Field 
                         id = "terms"
                         type = "checkbox"
